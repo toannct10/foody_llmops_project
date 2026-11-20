@@ -1,0 +1,56 @@
+{
+    "path_count": 177,
+    "parsed_path_count": 177,
+    "static_analysis_path_count": 10,
+    "static_analysis_parsed_path_count": 2,
+    "is_partial_parse_enabled": false,
+    "is_static_analysis_enabled": true,
+    "read_files_elapsed": 0.36006266599997616,
+    "load_macros_elapsed": 0.6850306409999121,
+    "parse_project_elapsed": 0.6954028669999843,
+    "patch_sources_elapsed": 0.042158078000056776,
+    "process_manifest_elapsed": 0.1226337110001623,
+    "load_all_elapsed": 1.995999754999957,
+    "projects": [
+        {
+            "project_name": "foody_cloud_analytics",
+            "elapsed": 0.6882461399998192,
+            "parsers": [
+                {
+                    "parser": "model",
+                    "elapsed": 0.2656830700000228,
+                    "parsed_path_count": 10
+                },
+                {
+                    "parser": "test",
+                    "elapsed": 0.11292188100014755,
+                    "parsed_path_count": 7
+                },
+                {
+                    "parser": "test",
+                    "elapsed": 0.3024399579999226,
+                    "parsed_path_count": 3
+                }
+            ],
+            "parsed_path_count": 20
+        },
+        {
+            "project_name": "dbt_snowflake",
+            "elapsed": 0.003488675999960833,
+            "parsers": [],
+            "parsed_path_count": 0
+        },
+        {
+            "project_name": "dbt",
+            "elapsed": 0.0034618539998518827,
+            "parsers": [
+                {
+                    "parser": "doc",
+                    "elapsed": 0.0001898650000384805,
+                    "parsed_path_count": 1
+                }
+            ],
+            "parsed_path_count": 1
+        }
+    ]
+}

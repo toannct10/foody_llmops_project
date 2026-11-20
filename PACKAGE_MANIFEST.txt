@@ -1,0 +1,14 @@
+Package: Foody_Intelligence_Full_Demo_With_Models
+Files: 887
+Stage bytes: 3164407898
+Source HEAD: 65eadd438885bf0ca0732431c2f661e49a116d2d
+Packaged Cross source SHA256: d6a1725a23df4a4aff830b8faa9adb689a0e1b00caea514f380bcd28bc7c5c6b
+Source state: current working tree, including uncommitted files.
+PhoBERT bytes: 548842693
+Qwen bytes: 2104932768
+Models: Qwen2.5-3B GGUF; TF-IDF sentiment/aspect; PhoBERT ABSA; MiniLM ONNX.
+Data: 400,000-order Sales source; 15,456 Review source/enriched parquet.
+Database: PostgreSQL custom-format dump with migration 005, views and marts.
+RAG: accepted 15,454-document Chroma and BM25 indexes.
+Source: src, app, scripts, tests, dags, dbt, sql, prompts, config, docs, devops.
+ZIP bytes: see adjacent ZIP file size after creation.

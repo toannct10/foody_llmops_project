@@ -1,0 +1,59 @@
+{
+  "version": "text_to_sql_models_v1",
+  "backend": "llama.cpp b11429",
+  "server_executable": ".qwen-runtime/b11429/llama-server.exe",
+  "context_size": 2048,
+  "threads": 8,
+  "gpu_layers_requested": 99,
+  "temperature": 0,
+  "seed": 42,
+  "max_output_tokens": 256,
+  "models": {
+    "qwen": {
+      "role": "production_generation_and_research",
+      "status": "production",
+      "capabilities": ["text_to_sql", "review_generation", "cross_synthesis", "structured_output"],
+      "benchmark_summary_ref": "20261107T022914Z-bccf46ea/summary.json",
+      "family": "Qwen",
+      "name": "Qwen2.5-3B-Instruct",
+      "repo": "Qwen/Qwen2.5-3B-Instruct-GGUF",
+      "revision": "cc1e68eea5f05f88f41a6de1fc73110178f23715",
+      "file": "models/qwen_v3/qwen2.5-3b-instruct-q4_k_m.gguf",
+      "sha256": "626b4a6678b86442240e33df819e00132d3ba7dddfe1cdc4fbb18e0a9615c62d",
+      "parameter_count": 3090000000,
+      "quantization": "Q4_K_M",
+      "port": 8194
+    },
+    "llama": {
+      "role": "research_evaluation",
+      "status": "benchmark",
+      "capabilities": ["text_to_sql", "structured_output"],
+      "benchmark_summary_ref": "20261107T022914Z-bccf46ea/summary.json",
+      "family": "Llama",
+      "name": "Llama-3.2-3B-Instruct",
+      "repo": "bartowski/Llama-3.2-3B-Instruct-GGUF",
+      "revision": "5ab33fa94d1d04e903623ae72c95d1696f09f9e8",
+      "file": "models/task2_llm/llama/Llama-3.2-3B-Instruct-Q4_K_M.gguf",
+      "sha256": "6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff",
+      "parameter_count": 3210000000,
+      "quantization": "Q4_K_M",
+      "port": 8195
+    },
+    "deepseek": {
+      "role": "research_evaluation",
+      "status": "benchmark",
+      "capabilities": ["text_to_sql", "structured_output"],
+      "benchmark_summary_ref": "20261107T022914Z-bccf46ea/summary.json",
+      "family": "DeepSeek",
+      "name": "DeepSeek-R1-Distill-Qwen-1.5B",
+      "repo": "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
+      "revision": "9cc28b17e86fa2415fcb070f8ee5ec27c965aa61",
+      "file": "models/task2_llm/deepseek/DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf",
+      "sha256": "1741e5b2d062b07acf048bf0d2c514dadf2a48f94e2b4aa0cfe069af3838ee2f",
+      "parameter_count": 1500000000,
+      "parameter_count_note": "approximately 1.5B; distilled Qwen2.5-Math base",
+      "quantization": "Q4_K_M",
+      "port": 8196
+    }
+  }
+}

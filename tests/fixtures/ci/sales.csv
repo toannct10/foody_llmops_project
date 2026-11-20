@@ -1,0 +1,4 @@
+order_id,restaurant_id,status,total_amount
+order-1,restaurant-1,Delivered,100000
+order-2,restaurant-1,Cancelled,50000
+order-3,restaurant-2,Delivered,75000

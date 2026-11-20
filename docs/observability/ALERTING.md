@@ -1,0 +1,7 @@
+# Demo alert rules
+
+Prometheus loads `devops/prometheus/alerts.yml`. Rules: `QwenServiceDown`, `RAGBackendDown`, `StreamlitDown`, `AirflowPipelineFailure`, `DataQualityGateFailed`, `HighLLMLatency` (P95 > 90 s for 10 m), `TextToSQLValidationFailureSpike` (> 5/10 m), `TextToSQLExecutionFailureSpike` (> 2/10 m), `RAGInsufficientEvidenceSpike` (> 5/10 m), and `HighMemoryUsage` (> 92% for 10 m). Service failures require 2 minutes to avoid brief restart noise. Tune these demo thresholds to measured workload before production use; they are not SLOs.
+
+Airflow alerts ignore controlled quality-fixture runs. An absent metric for an optional service or not-yet-accepted cloud system does not fire. Prometheus `/api/v1/alerts` supplies active state; the System Monitor records firing/resolved transitions for only known rules in SQLite for 30 days. If Prometheus is unreachable, no resolution is inferred.
+
+Alertmanager was intentionally **not added**: the existing local stack has no notification receiver, and Prometheus rules plus System Monitor provide visible demo alerting without requiring email/SMS or a new service. A future deployment may wire Alertmanager to a local webhook/log sink; no notification delivery is claimed here. A controlled alert can be tested by lowering a temporary threshold in a disposable copy of the rules, then restoring it; do not stop persistent services merely to trigger an alert.

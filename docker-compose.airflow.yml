@@ -1,0 +1,36 @@
+# Optional local Airflow acceptance stack; existing services are unchanged.
+services:
+  rag-backend:
+    environment:
+      FOODY_AIRFLOW_MONITOR_ENABLED: "true"
+  streamlit:
+    environment:
+      FOODY_AIRFLOW_MONITOR_ENABLED: "true"
+  airflow:
+    profiles: [airflow]
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow
+    image: foody-airflow:2.11.1-local
+    command: standalone
+    environment:
+      AIRFLOW_HOME: /opt/airflow
+      AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: sqlite:////opt/airflow/state/airflow.db
+      AIRFLOW__CORE__EXECUTOR: SequentialExecutor
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "False"
+      AIRFLOW__CORE__DEFAULT_TIMEZONE: Asia/Ho_Chi_Minh
+      AIRFLOW__CORE__LOAD_EXAMPLES: "False"
+      FOODY_DATABASE_URL: postgresql://foody:${FOODY_DB_PASSWORD:-foody_local_demo}@postgres:5432/foody
+      GIT_SHA: ${GIT_SHA:-unknown}
+    ports:
+      - "127.0.0.1:8088:8080"
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models:ro
+      - ./reports:/app/reports
+      - ./outputs/airflow:/app/outputs/airflow
+      - ./state/airflow:/opt/airflow/state
+      - ./logs/airflow:/opt/airflow/logs
+    depends_on:
+      postgres:
+        condition: service_healthy

@@ -1,0 +1,3 @@
+# Optional cloud-ingestion environment; not installed in local/demo images.
+boto3==1.42.49
+snowflake-connector-python==4.3.0

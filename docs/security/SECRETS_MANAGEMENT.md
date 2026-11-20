@@ -1,0 +1,6 @@
+# Secrets management
+
+- Commit `.env.example` placeholders only. `.env`, `.env.cloud`, `.env.*` (except the example), private keys, GGUF weights, local databases, model/runtime state and Terraform state are ignored. Keep real DSNs, OAuth tokens, AWS credentials and Snowflake passwords in the operator environment or a private secret store.
+- Local Compose accepts `FOODY_AI_DATABASE_URL` through environment interpolation. Its value can appear in Docker process inspection; use a dedicated low-privilege credential and never include it in screenshots, logs, bug reports or CI output. The accepted demo defaults are for a private workstation only.
+- GitHub Actions uses read-only repository permission and no cloud credential. For a future live deployment, inject credentials through GitHub repository/environment secrets with protected environments; never store them in workflow YAML. `scripts/security_scan.py` runs on tracked files and prints path plus finding category, not matched secret values.
+- The scanner checks high-confidence token/key signatures and private artifact paths. It cannot prove absence of every secret, scan Git history, or validate a deployed secret manager. Rotate any secret found in Git rather than merely deleting the file.

@@ -1,0 +1,82 @@
+# Additive batch-demo monitoring stack. Compose manages its named volumes.
+services:
+  rag-backend:
+    image: foody-rag-review2:local
+    build:
+      context: .
+      dockerfile: Dockerfile.devops
+      args:
+        BASE_IMAGE: ${FOODY_BASE_IMAGE:-shopee-data-mlops-platform-rag-backend:latest}
+    environment:
+      QWEN_BASE_URL: http://qwen:8193
+      FOODY_DATABASE_URL: postgresql://foody:${FOODY_DB_PASSWORD:-foody_local_demo}@postgres:5432/foody
+      GIT_SHA: ${GIT_SHA:-unknown}
+      COST_TRACKING_ENABLED: ${COST_TRACKING_ENABLED:-false}
+      LOCAL_INFERENCE_DEVICE: ${LOCAL_INFERENCE_DEVICE:-}
+      LOCAL_CPU_COST_PER_HOUR: ${LOCAL_CPU_COST_PER_HOUR:-}
+      LOCAL_GPU_COST_PER_HOUR: ${LOCAL_GPU_COST_PER_HOUR:-}
+    volumes:
+      - ./outputs/airflow:/app/outputs/airflow:ro
+  streamlit:
+    image: foody-rag-review2:local
+    volumes:
+      - ./outputs/airflow:/app/outputs/airflow:ro
+    environment:
+      TEXT_TO_SQL_ENABLED: "true"
+      TEXT_TO_SQL_MAX_ROWS: "100"
+      TEXT_TO_SQL_TIMEOUT_SECONDS: "5"
+      FOODY_STREAMLIT_METRICS_PORT: "8002"
+      FOODY_DATABASE_URL: postgresql://foody:${FOODY_DB_PASSWORD:-foody_local_demo}@postgres:5432/foody
+      FOODY_AI_DATABASE_URL: ${FOODY_AI_DATABASE_URL:-}
+  postgres:
+    image: postgres:17.11-alpine3.23
+    ports:
+      - "127.0.0.1:5434:5432"
+    environment:
+      POSTGRES_USER: foody
+      POSTGRES_PASSWORD: ${FOODY_DB_PASSWORD:-foody_local_demo}
+      POSTGRES_DB: foody
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U foody -d foody"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+    volumes:
+      - foody_postgres_data:/var/lib/postgresql/data
+  prometheus:
+    image: prom/prometheus:v3.5.5
+    command: ["--config.file=/etc/prometheus/prometheus.yml", "--storage.tsdb.path=/prometheus", "--storage.tsdb.retention.time=6h", "--storage.tsdb.retention.size=256MB", "--web.enable-lifecycle"]
+    volumes:
+      - ./devops/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./devops/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+      - foody_prometheus_data:/prometheus
+    ports:
+      - "127.0.0.1:9090:9090"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:9090/-/healthy"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+  grafana:
+    image: grafana/grafana:12.2.9
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${FOODY_GRAFANA_PASSWORD:-foody_local_demo}
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_PLUGINS_PLUGIN_ADMIN_ENABLED: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - foody_grafana_data:/var/lib/grafana
+      - ./devops/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./devops/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:3000/api/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+volumes:
+  foody_postgres_data: {name: foody_postgres_data}
+  foody_prometheus_data: {name: foody_prometheus_data}
+  foody_grafana_data: {name: foody_grafana_data}

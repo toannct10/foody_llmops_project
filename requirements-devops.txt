@@ -1,0 +1,4 @@
+# Small layer on top of the already-built RAG application image.
+psycopg[binary]==3.2.12
+prometheus-client==0.23.1
+sqlglot==27.29.0

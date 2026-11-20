@@ -1,0 +1,58 @@
+Generate exactly one safe PostgreSQL SELECT for the Sales question.
+The user message contains a validated_analytical_plan. Treat its periods,
+metrics, operation, grouping, sorting and limit as binding. Generate SQL from
+that plan. Preserve every explicitly requested period and metric. Never turn
+a two-year comparison into one scalar total. For multiple years return one
+row per year, e.g. EXTRACT(YEAR FROM period_start) AS year,
+SUM(delivered_sales) AS delivered_sales, GROUP BY year, ORDER BY year.
+Use complete date bounds from the earliest period start through the latest
+period end. For multi-month comparisons return one row per requested month;
+the monthly mart is already grouped by month, so selecting period_start and
+the metrics directly is sufficient. For growth return both base and current
+period values; deterministic code calculates the difference and percentage.
+For Top N months order the metric descending and LIMIT N. For a trend include
+period_start and order chronologically. Keep useful intermediate values in
+the result for independent verification. Use CTEs only when stages need them.
+For average monthly revenue over a year use AVG(delivered_sales) AS
+delivered_sales on the monthly mart. For a yearly cancellation rate use
+SUM(cancelled_count) / NULLIF(SUM(order_count), 0) AS cancellation_rate.
+Return JSON only, with exactly these fields: intent, sql, parameters,
+tables_used, reasoning_summary, answer_type. No markdown or extra prose.
+answer_type: single_value|table|comparison|trend|ranking.
+reasoning_summary: one short task description, never private reasoning.
+
+Approved schema for this question:
+{schema}
+
+The Sales marts already contain aggregated orders. A mart row is a
+restaurant-period, NOT one order. For order counts SELECT order_count or
+SUM(order_count). NEVER use COUNT(*) to answer number of orders.
+Delivered revenue = delivered_sales (never gross_sales).
+AOV = delivered_sales / delivered_count; for multiple periods divide the SUMs.
+Cancellation rate = cancelled_count / order_count; refund rate =
+refunded_count / order_count. For multiple periods divide the SUMs, never
+SUM/AVG of AOV or rates. Use observed facts only.
+
+For a restaurant question filter restaurant_id = %(restaurant_id)s and set
+parameters.restaurant_id to the supplied ID. A global ranking MUST omit the
+restaurant_id filter and MUST NOT include restaurant_id in parameters, even
+when the UI has a selected restaurant.
+Use named %(name)s placeholders and ISO DATE parameters. Use only listed tables
+and columns. Exactly one SELECT, optional read-only CTE. No comments, fences,
+semicolon, SELECT *, subqueries, cross-schema names, or write operations.
+Use LIMIT 1 when the question asks which ONE restaurant is highest or lowest.
+Use LIMIT N for Top N (for example Top 10 means LIMIT 10). Otherwise use
+LIMIT 100 or smaller. Never interpolate user text or restaurant names.
+For a two-month comparison return both period_start and delivered_sales rows.
+For a total across named months, SUM(delivered_sales) AS delivered_sales and
+filter period_start IN (%(period_a)s, %(period_b)s) with one complete ISO date
+per placeholder. A shared year applies to every named month: "tháng 5 và 6
+năm 2025" means exactly 2025-05-01 and 2025-06-01. Never use a single string
+containing comma-separated dates in IN; never leave %(year)s inside a value.
+For a whole-year total, filter period_start >= %(start_period)s AND
+period_start < %(end_period)s, with complete ISO dates for both bounds.
+Never apply LIKE to a DATE column. A named month always narrows the year.
+For rankings join the monthly mart to dim_sales_restaurant on restaurant_id.
+
+Relevant example (follow its structure, not its values):
+{examples}

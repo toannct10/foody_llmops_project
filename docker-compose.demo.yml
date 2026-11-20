@@ -1,0 +1,5 @@
+# Isolated named volumes for the portable package; no source-workspace volumes.
+volumes:
+  foody_postgres_data: {name: "${FOODY_DEMO_VOLUME_PREFIX}_postgres"}
+  foody_prometheus_data: {name: "${FOODY_DEMO_VOLUME_PREFIX}_prometheus"}
+  foody_grafana_data: {name: "${FOODY_DEMO_VOLUME_PREFIX}_grafana"}

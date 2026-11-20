@@ -1,0 +1,66 @@
+version: 2
+
+models:
+  - name: stg_sales
+    description: Typed, cleaned, deterministically deduplicated Sales orders with RAW lineage.
+    columns:
+      - name: order_id
+        description: Stable source order ID and incremental merge key.
+        data_tests: [not_null, unique]
+      - name: restaurant_id
+        description: Trimmed source restaurant ID, shared with Reviews.
+        data_tests: [not_null]
+      - name: order_date
+        description: Parsed calendar date in YYYY-MM-DD form.
+        data_tests: [not_null]
+      - name: sales_amount
+        description: Nonnegative source amount cast to NUMBER(14,2).
+        data_tests: [not_null]
+      - name: order_status
+        description: Canonical Delivered, Cancelled, or Refunded status.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [Delivered, Cancelled, Refunded]
+      - name: batch_id
+        description: Joint cloud source batch ID.
+        data_tests: [not_null]
+      - name: source_hash
+        description: SHA256 of the Sales source CSV.
+        data_tests: [not_null]
+      - name: source_loaded_at
+        description: RAW arrival timestamp used for incremental filtering.
+        data_tests: [not_null]
+  - name: stg_reviews
+    description: Parsed Review rows, deterministically deduplicated by content-derived ID.
+    columns:
+      - name: review_id
+        description: Stable Snowflake content hash key; differs from Python local ID encoding.
+        data_tests: [not_null, unique]
+      - name: restaurant_id
+        description: Trimmed direct Sales/Review restaurant ID.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_restaurant')
+                field: restaurant_id
+      - name: review_date
+        description: Parsed Review Time in DD/MM/YYYY form.
+        data_tests: [not_null]
+      - name: rating
+        description: Rating cast to NUMBER(4,2), valid range 0 through 10.
+        data_tests: [not_null]
+      - name: review_text
+        description: Whitespace-normalized source Comment; no AI inference.
+        data_tests: [not_null]
+      - name: batch_id
+        description: Joint cloud source batch ID.
+        data_tests: [not_null]
+      - name: source_hash
+        description: SHA256 of the Review source CSV.
+        data_tests: [not_null]
+      - name: source_loaded_at
+        description: RAW arrival timestamp used for incremental filtering.
+        data_tests: [not_null]

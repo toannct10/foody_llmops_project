@@ -1,0 +1,13 @@
+{
+  "version": "model_selection_v1",
+  "selected_model": "qwen",
+  "benchmark_run": "20261107T022914Z-bccf46ea",
+  "dataset_version": "foody_text_to_sql_12_v1",
+  "dataset_sha256": "3b995a92f053366898e65cb5eb3f7e01597ce6f6da18adf3a65e021586c69cfc",
+  "selection_reason": [
+    "10/10 correct model results on safe Text-to-SQL cases",
+    "100% structured-output validity",
+    "Lowest measured mean generation latency among the three candidates"
+  ],
+  "production_change": false
+}

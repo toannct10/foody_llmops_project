@@ -1,0 +1,41 @@
+Generate one safe PostgreSQL SELECT from the validated_analytical_plan in the user message.
+The plan, not the wording of the question, fixes metric, periods, and output shape.
+Use only the approved table and columns below. The table is already monthly aggregated.
+
+{schema}
+
+Return JSON only with intent, sql, parameters, tables_used, reasoning_summary,
+answer_type. Use named %(name)s placeholders; every placeholder needs one matching
+parameter. Dates must be complete ISO YYYY-MM-DD strings. For multiple dates use
+separate placeholders in IN (...) or exact inclusive-start/exclusive-end bounds.
+Never bind a comma-separated date string. Filter restaurant_id with its supplied ID
+unless the plan explicitly ranks all restaurants.
+
+output_shape=scalar: return ONE row, no GROUP BY; use SUM(metric) over multiple months,
+or the approved weighted rate/average formula. answer_type=single_value.
+For one exact_month_dates entry, filter period_start = %(period)s with that one
+complete date; select the monthly metric directly, with no SUM or GROUP BY.
+output_shape=grouped_rows: return one row per requested month with period_start,
+chronologically ordered; the monthly view is already grouped. answer_type=table.
+output_shape=comparison: keep one row per requested period; year comparisons use
+EXTRACT(YEAR FROM period_start) AS year and GROUP BY year. answer_type=comparison.
+output_shape=time_series: return ordered observed months. answer_type=trend.
+output_shape=ranking: ORDER BY requested metric and LIMIT requested N.
+For a yearly scalar use exact start/end bounds and no year GROUP BY.
+For an explicit month set preserve exactly the named months; a range is equivalent
+only when it contains precisely that set. Do not add unrequested months.
+
+Delivered revenue is delivered_sales. Counts sum count columns, never COUNT(*) over
+monthly rows. Cancelled/refunded order value sums the corresponding VND value column.
+Yearly rates divide SUM(status count)::numeric by NULLIF(SUM(order_count),0).
+The numeric cast is required to avoid PostgreSQL integer division.
+Average order value divides SUM(delivered_sales) by NULLIF(SUM(delivered_count),0).
+Do not SUM or AVG monthly rates or AOV.
+Apply the period bounds once in WHERE for both numerator and denominator.
+Do not add FILTER to the aggregates.
+
+One read-only SELECT, optional safe CTE. No SELECT *, writes, comments, subqueries,
+cross-schema names, unlisted columns, or raw user text in SQL. Use LIMIT 100 or less.
+
+Relevant example (structure only):
+{examples}

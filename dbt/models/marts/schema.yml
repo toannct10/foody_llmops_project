@@ -1,0 +1,116 @@
+version: 2
+
+models:
+  - name: dim_restaurant
+    description: Source-owned Sales restaurant IDs with the most frequent accepted Sales name.
+    columns:
+      - name: restaurant_id
+        description: Canonical direct Sales/Review restaurant ID.
+        data_tests: [not_null, unique]
+      - name: restaurant_name
+        description: Most frequent nonempty Sales name, with alphabetical tie break.
+      - name: has_reviews
+        description: Whether this ID appears in accepted Review staging rows.
+        data_tests: [not_null]
+  - name: fact_order
+    description: Incremental typed order fact with source lineage; includes future-dated source rows.
+    columns:
+      - name: order_id
+        description: Stable source order key.
+        data_tests: [not_null, unique]
+      - name: restaurant_id
+        description: Source restaurant key.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_restaurant')
+                field: restaurant_id
+      - name: order_status
+        description: Delivered, Cancelled, or Refunded.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [Delivered, Cancelled, Refunded]
+      - name: batch_id
+        description: RAW batch lineage.
+        data_tests: [not_null]
+  - name: fact_review
+    description: Incremental Review fact from RAW rating/text; no sentiment/aspect inference.
+    columns:
+      - name: review_id
+        description: Stable Snowflake Review content key.
+        data_tests: [not_null, unique]
+      - name: restaurant_id
+        description: Direct Sales/Review restaurant ID.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_restaurant')
+                field: restaurant_id
+      - name: rating
+        description: Valid numeric rating from 0 through 10.
+        data_tests: [not_null]
+      - name: batch_id
+        description: RAW batch lineage.
+        data_tests: [not_null]
+  - name: restaurant_daily_sales
+    description: Vietnam-time observable daily Sales with Delivered-only revenue and accepted rates.
+    columns:
+      - name: restaurant_id
+        description: Restaurant group key.
+        data_tests: [not_null]
+      - name: period_start
+        description: Calendar day in Vietnam-time observed range.
+        data_tests: [not_null]
+      - name: delivered_sales
+        description: Sum of Delivered order amounts only.
+      - name: aov
+        description: Delivered revenue divided by Delivered order count.
+      - name: cancellation_rate
+        description: Cancelled count divided by all orders.
+      - name: refund_rate
+        description: Refunded count divided by all orders.
+  - name: restaurant_weekly_sales
+    description: Monday-start weekly aggregation of observable daily Sales.
+    columns:
+      - name: restaurant_id
+        description: Restaurant group key.
+        data_tests: [not_null]
+      - name: period_start
+        description: ISO Monday week start.
+        data_tests: [not_null]
+      - name: wow_growth
+        description: Change from the immediately preceding calendar week, if present.
+  - name: restaurant_monthly_sales
+    description: Calendar-month aggregation of observable daily Sales.
+    columns:
+      - name: restaurant_id
+        description: Restaurant group key.
+        data_tests: [not_null]
+      - name: period_start
+        description: First day of month.
+        data_tests: [not_null]
+      - name: mom_growth
+        description: Change from the immediately preceding calendar month, if present.
+  - name: restaurant_sales_summary
+    description: All observed Sales dates summarized per restaurant.
+    columns:
+      - name: restaurant_id
+        description: Restaurant group key.
+        data_tests: [not_null, unique]
+  - name: restaurant_monthly_reviews
+    description: Monthly Review count and mean rating without inferred sentiment/aspects.
+    columns:
+      - name: restaurant_id
+        description: Restaurant group key.
+        data_tests: [not_null]
+      - name: period_start
+        description: First day of Review month.
+        data_tests: [not_null]
+      - name: review_count
+        description: Deduplicated Review count.
+      - name: average_rating
+        description: Mean source rating, rounded to two decimals.

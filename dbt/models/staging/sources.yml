@@ -1,0 +1,60 @@
+version: 2
+
+sources:
+  - name: foody_raw
+    description: >
+      Accepted Sales and Review CSV rows loaded by the optional cloud foundation.
+      Review RAW retains exact duplicate source rows for audit.
+    database: "{{ env_var('SNOWFLAKE_DATABASE', 'FOODY') }}"
+    schema: "{{ env_var('SNOWFLAKE_RAW_SCHEMA', 'RAW') }}"
+    config:
+      loaded_at_field: LOADED_AT
+      freshness:
+        warn_after: {count: 30, period: day}
+    tables:
+      - name: SALES_SOURCE
+        description: Six-column order CSV plus source/batch lineage; 400,000 accepted local rows.
+        columns:
+          - name: ORDER_ID
+            description: Source-owned order identifier.
+            data_tests: [not_null]
+          - name: RESTAURANT_ID
+            description: Source-owned restaurant identifier.
+            data_tests: [not_null]
+          - name: BATCH_ID
+            description: Joint Review/Sales source batch identity.
+            data_tests: [not_null]
+          - name: SOURCE_HASH
+            description: SHA256 of the uploaded Sales CSV.
+            data_tests: [not_null]
+      - name: REVIEWS_SOURCE
+        description: Six-column Review CSV plus lineage; duplicate source rows are expected.
+        columns:
+          - name: RESTAURANT_ID
+            description: Canonical Sales/Review restaurant ID verified before cloud load.
+            data_tests: [not_null]
+          - name: RATING
+            description: Original rating text, cast in staging.
+            data_tests: [not_null]
+          - name: BATCH_ID
+            description: Joint Review/Sales source batch identity.
+            data_tests: [not_null]
+          - name: SOURCE_HASH
+            description: SHA256 of the uploaded Review CSV.
+            data_tests: [not_null]
+      - name: LOAD_AUDIT
+        description: One successful load audit per source and joint batch ID.
+        columns:
+          - name: SOURCE_NAME
+            description: sales or reviews.
+            data_tests:
+              - not_null
+              - accepted_values:
+                  arguments:
+                    values: [sales, reviews]
+          - name: BATCH_ID
+            description: Joint source batch identity.
+            data_tests: [not_null]
+          - name: ROW_COUNT
+            description: Loaded RAW source row count.
+            data_tests: [not_null]

@@ -1,0 +1,688 @@
+{
+  "uid": "foody-review2",
+  "title": "Foody DevOps & LLMOps",
+  "schemaVersion": 40,
+  "version": 1,
+  "refresh": "15s",
+  "timezone": "browser",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "API requests/min",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(foody_api_requests_total[5m])) * 60",
+          "legendFormat": "API requests/min"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "API error rate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "(sum(rate(foody_api_requests_total{status=~\"5..\"}[5m])) or vector(0)) / clamp_min(sum(rate(foody_api_requests_total[5m])), 0.001)",
+          "legendFormat": "API error rate"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "API latency P95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(foody_api_request_duration_seconds_bucket[5m])))",
+          "legendFormat": "API latency P95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "RAG requests",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(foody_rag_requests_total)",
+          "legendFormat": "RAG requests"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "RAG generation modes",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (generation_mode) (foody_rag_generation_mode_total)",
+          "legendFormat": "RAG generation modes"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Retrieval routes",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (route) (foody_rag_retrieval_route_total)",
+          "legendFormat": "Retrieval routes"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "LLM latency P95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(foody_llm_latency_seconds_bucket[5m])))",
+          "legendFormat": "LLM latency P95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "LLM input/output tokens",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(foody_llm_input_tokens_total)",
+          "legendFormat": "input"
+        },
+        {
+          "expr": "sum(foody_llm_output_tokens_total)",
+          "legendFormat": "output"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 11,
+      "title": "Sales SQL requests",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(foody_sales_queries_total)",
+          "legendFormat": "Sales SQL"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 32
+      }
+    },
+    {
+      "id": 12,
+      "title": "Cross-analysis requests",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(foody_cross_analysis_requests_total)",
+          "legendFormat": "Cross-analysis"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 32
+      }
+    },
+    {
+      "id": 13,
+      "title": "Sales SQL latency P95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(foody_sales_sql_duration_seconds_bucket[5m])))",
+          "legendFormat": "Sales SQL P95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 40
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Service health",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_service_health",
+          "legendFormat": "{{service}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 48
+      }
+    },
+    {
+      "id": 15,
+      "title": "Model gateway calls by model/task",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (model,task,status) (foody_model_gateway_requests_total)",
+          "legendFormat": "{{model}} {{task}} {{status}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 48
+      }
+    },
+    {
+      "id": 16,
+      "title": "RAG retrieval latency P95",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum by (le) (rate(foody_rag_retrieval_latency_seconds_bucket[5m])))",
+          "legendFormat": "Retrieval P95"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 56
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "id": 17,
+      "title": "RAG grounding and fallback",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (status) (foody_rag_grounding_total)",
+          "legendFormat": "{{status}}"
+        },
+        {
+          "expr": "sum(foody_rag_fallback_total)",
+          "legendFormat": "extractive fallback"
+        },
+        {
+          "expr": "sum(foody_rag_insufficient_evidence_total)",
+          "legendFormat": "insufficient evidence"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 56
+      }
+    },
+    {
+      "id": 18,
+      "title": "Text-to-SQL Qwen vs fallback",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (mode) (text_to_sql_execution_mode_total)",
+          "legendFormat": "{{mode}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 64
+      }
+    },
+    {
+      "id": 19,
+      "title": "Text-to-SQL validation/execution failures",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum by (reason) (text_to_sql_validation_failures_total)",
+          "legendFormat": "validation {{reason}}"
+        },
+        {
+          "expr": "sum(text_to_sql_execution_failures_total)",
+          "legendFormat": "execution"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 64
+      }
+    },
+    {
+      "id": 20,
+      "title": "Local Airflow run and quality gate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_pipeline_last_run_failed",
+          "legendFormat": "last run failed"
+        },
+        {
+          "expr": "foody_pipeline_quality_gate_failed",
+          "legendFormat": "quality gate failed"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 72
+      }
+    },
+    {
+      "id": 21,
+      "title": "Airflow processed and failed rows",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_pipeline_last_rows",
+          "legendFormat": "{{kind}}"
+        }
+      ],
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 72
+      }
+    },
+    {
+      "id": 22,
+      "title": "Last Airflow success",
+      "type": "stat",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_pipeline_last_success_timestamp_seconds",
+          "legendFormat": "published"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 80
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeAsIso"
+        }
+      }
+    },
+    {
+      "id": 23,
+      "title": "Visible host memory",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_host_memory_usage_ratio",
+          "legendFormat": "memory ratio"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 80
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        }
+      }
+    },
+    {
+      "id": 24,
+      "title": "Backend resident memory",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_process_resident_memory_bytes",
+          "legendFormat": "backend RSS"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 80
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      }
+    },
+    {
+      "id": 25,
+      "title": "Configured local compute cost estimate",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_local_estimated_cost",
+          "legendFormat": "ESTIMATE"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 86
+      },
+      "description": "Absent by default. Requires explicit device and hourly rate; no cloud spend is implied."
+    },
+    {
+      "id": 26,
+      "title": "Active configured alerts",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "sum(ALERTS{alertstate=\"firing\"}) or vector(0)",
+          "legendFormat": "firing"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 86
+      }
+    },
+    {
+      "id": 27,
+      "title": "Visible CPU usage",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_visible_cpu_percent",
+          "legendFormat": "CPU"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 92
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      }
+    },
+    {
+      "id": 28,
+      "title": "Visible GPU usage",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_visible_gpu_percent",
+          "legendFormat": "GPU"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 92
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent"
+        }
+      },
+      "description": "No series if nvidia-smi is unavailable in the backend container."
+    },
+    {
+      "id": 29,
+      "title": "Visible VRAM used",
+      "type": "timeseries",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "foody-prometheus"
+      },
+      "targets": [
+        {
+          "expr": "foody_visible_vram_used_bytes",
+          "legendFormat": "VRAM"
+        }
+      ],
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 92
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        }
+      },
+      "description": "No series if nvidia-smi is unavailable in the backend container."
+    }
+  ],
+  "tags": [
+    "foody",
+    "review2"
+  ]
+}

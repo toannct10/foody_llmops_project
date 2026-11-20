@@ -1,0 +1,9 @@
+FROM foody-airflow:2.11.1-local
+WORKDIR /app
+COPY requirements-cloud.txt ./
+RUN pip install --no-cache-dir -r requirements-cloud.txt
+COPY requirements-dbt.txt ./
+RUN python -m venv /home/airflow/dbt-venv && \
+    /home/airflow/dbt-venv/bin/pip install --no-cache-dir -r requirements-dbt.txt
+COPY --chown=airflow:root dbt ./dbt
+ENV PATH="/home/airflow/dbt-venv/bin:${PATH}"

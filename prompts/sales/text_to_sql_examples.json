@@ -1,0 +1,299 @@
+[
+  {
+    "id": "revenue",
+    "question": "Doanh thu tháng 5/2026 của nhà hàng 2751?",
+    "output": {
+      "intent": "monthly_revenue",
+      "sql": "SELECT delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start = %(period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Read Delivered revenue for the selected month",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "month_set_values",
+    "question": "Doanh thu tháng 5 và 6 năm 2025?",
+    "output": {
+      "intent": "named_months_revenue",
+      "sql": "SELECT period_start, delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start IN (%(period_a)s, %(period_b)s) ORDER BY period_start LIMIT 2",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period_a": "2025-05-01",
+        "period_b": "2025-06-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Return each requested month separately",
+      "answer_type": "table"
+    }
+  },
+  {
+    "id": "cancelled_value",
+    "question": "Số tiền đơn hàng bị hủy trong năm 2026?",
+    "output": {
+      "intent": "cancelled_order_value",
+      "sql": "SELECT SUM(cancelled_order_value) AS cancelled_order_value FROM restaurant_monthly_order_status_values WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2026-01-01",
+        "end_period": "2027-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_order_status_values"
+      ],
+      "reasoning_summary": "Sum cancelled order value in VND",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "cancelled_count",
+    "question": "Số đơn hàng bị hủy trong năm 2026?",
+    "output": {
+      "intent": "cancelled_order_count",
+      "sql": "SELECT SUM(cancelled_order_count) AS cancelled_order_count FROM restaurant_monthly_order_status_values WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2026-01-01",
+        "end_period": "2027-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_order_status_values"
+      ],
+      "reasoning_summary": "Sum cancelled order count",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "year_cancellation_rate",
+    "question": "Tỷ lệ hủy trong năm 2026?",
+    "output": {
+      "intent": "cancellation_rate",
+      "sql": "SELECT SUM(cancelled_count)::numeric / NULLIF(SUM(order_count), 0) AS cancellation_rate FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2026-01-01",
+        "end_period": "2027-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Use total cancelled orders divided by all orders across the year",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "month_set_total",
+    "question": "Tổng doanh thu tháng 5 và 6 năm 2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "named_months_revenue_total",
+      "sql": "SELECT SUM(delivered_sales) AS delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start IN (%(period_a)s, %(period_b)s) LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period_a": "2025-05-01",
+        "period_b": "2025-06-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Sum Delivered revenue for exactly the two named months",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "year_total",
+    "question": "Tổng doanh thu năm 2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "year_revenue_total",
+      "sql": "SELECT SUM(delivered_sales) AS delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2025-01-01",
+        "end_period": "2026-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Sum Delivered revenue across the requested year",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "orders",
+    "question": "Số đơn tháng 5/2026 của nhà hàng 2751?",
+    "output": {
+      "intent": "monthly_orders",
+      "sql": "SELECT order_count FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start = %(period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Read the mart order count",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "aov",
+    "question": "AOV tháng 5/2026 của nhà hàng 2751?",
+    "output": {
+      "intent": "monthly_aov",
+      "sql": "SELECT aov FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start = %(period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Read Delivered AOV",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "comparison",
+    "question": "So sánh doanh thu tháng 5/2026 và tháng 5/2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "compare_revenue",
+      "sql": "SELECT period_start, delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start IN (%(period_a)s, %(period_b)s) ORDER BY period_start LIMIT 2",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period_a": "2026-05-01",
+        "period_b": "2025-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Read both months for comparison",
+      "answer_type": "comparison"
+    }
+  },
+  {
+    "id": "cancellation_refund",
+    "question": "Tỷ lệ hủy tháng 5/2026 của nhà hàng 2751?",
+    "output": {
+      "intent": "monthly_cancellation_rate",
+      "sql": "SELECT cancellation_rate FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start = %(period)s LIMIT 1",
+      "parameters": {
+        "restaurant_id": "2751",
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Read the observed cancellation rate",
+      "answer_type": "single_value"
+    }
+  },
+  {
+    "id": "top_revenue",
+    "question": "Top 10 nhà hàng doanh thu cao nhất tháng 5/2026?",
+    "output": {
+      "intent": "top_revenue",
+      "sql": "SELECT r.restaurant_id, r.restaurant_name, m.delivered_sales FROM restaurant_monthly_sales AS m JOIN dim_sales_restaurant AS r ON m.restaurant_id = r.restaurant_id WHERE m.period_start = %(period)s ORDER BY m.delivered_sales DESC LIMIT 10",
+      "parameters": {
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales",
+        "dim_sales_restaurant"
+      ],
+      "reasoning_summary": "Rank restaurants by Delivered revenue",
+      "answer_type": "ranking"
+    }
+  },
+  {
+    "id": "cancellation_ranking",
+    "question": "Nhà hàng nào có tỷ lệ hủy cao nhất?",
+    "output": {
+      "intent": "top_cancellation_rate",
+      "sql": "SELECT r.restaurant_id, r.restaurant_name, s.cancellation_rate FROM restaurant_sales_summary AS s JOIN dim_sales_restaurant AS r ON s.restaurant_id = r.restaurant_id ORDER BY s.cancellation_rate DESC LIMIT 1",
+      "parameters": {},
+      "tables_used": [
+        "restaurant_sales_summary",
+        "dim_sales_restaurant"
+      ],
+      "reasoning_summary": "Rank restaurants by all-time cancellation rate",
+      "answer_type": "ranking"
+    }
+  },
+  {
+    "id": "cancellation_ranking_monthly",
+    "question": "Nhà hàng nào có tỷ lệ hủy cao nhất tháng 5/2026?",
+    "output": {
+      "intent": "top_cancellation_rate_month",
+      "sql": "SELECT r.restaurant_id, r.restaurant_name, m.cancellation_rate FROM restaurant_monthly_sales AS m JOIN dim_sales_restaurant AS r ON m.restaurant_id = r.restaurant_id WHERE m.period_start = %(period)s ORDER BY m.cancellation_rate DESC LIMIT 1",
+      "parameters": {
+        "period": "2026-05-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales",
+        "dim_sales_restaurant"
+      ],
+      "reasoning_summary": "Rank restaurants by monthly cancellation rate",
+      "answer_type": "ranking"
+    }
+  },
+  {
+    "id": "multi_year_comparison",
+    "question": "Doanh thu năm 2024 và năm 2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "compare_year_revenue",
+      "sql": "SELECT EXTRACT(YEAR FROM period_start) AS year, SUM(delivered_sales) AS delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s GROUP BY EXTRACT(YEAR FROM period_start) ORDER BY year LIMIT 2",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2024-01-01",
+        "end_period": "2026-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Return separate full-year totals",
+      "answer_type": "comparison"
+    }
+  },
+  {
+    "id": "top_months",
+    "question": "Top 5 tháng doanh thu cao nhất năm 2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "rank_month_revenue",
+      "sql": "SELECT period_start, delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s ORDER BY delivered_sales DESC LIMIT 5",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2025-01-01",
+        "end_period": "2026-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Rank monthly revenue within one year",
+      "answer_type": "ranking"
+    }
+  },
+  {
+    "id": "month_trend",
+    "question": "Xu hướng doanh thu từ tháng 1/2024 đến tháng 12/2025 của nhà hàng 2751?",
+    "output": {
+      "intent": "month_revenue_trend",
+      "sql": "SELECT period_start, delivered_sales FROM restaurant_monthly_sales WHERE restaurant_id = %(restaurant_id)s AND period_start >= %(start_period)s AND period_start < %(end_period)s ORDER BY period_start LIMIT 24",
+      "parameters": {
+        "restaurant_id": "2751",
+        "start_period": "2024-01-01",
+        "end_period": "2026-01-01"
+      },
+      "tables_used": [
+        "restaurant_monthly_sales"
+      ],
+      "reasoning_summary": "Return chronological monthly revenue rows",
+      "answer_type": "trend"
+    }
+  }
+]

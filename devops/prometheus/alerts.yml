@@ -1,0 +1,53 @@
+groups:
+  - name: foody_demo_operations
+    rules:
+      - alert: QwenServiceDown
+        expr: foody_service_health{service="qwen"} == 0
+        for: 2m
+        labels: {severity: critical, component: qwen}
+        annotations: {summary: "Qwen health probe is failing"}
+      - alert: RAGBackendDown
+        expr: up{job="foody-api"} == 0
+        for: 2m
+        labels: {severity: critical, component: backend}
+        annotations: {summary: "RAG backend scrape is unavailable"}
+      - alert: StreamlitDown
+        expr: up{job="foody-streamlit"} == 0
+        for: 2m
+        labels: {severity: warning, component: streamlit}
+        annotations: {summary: "Streamlit metrics endpoint is unavailable"}
+      - alert: AirflowPipelineFailure
+        expr: foody_pipeline_last_run_failed == 1
+        for: 2m
+        labels: {severity: warning, component: airflow}
+        annotations: {summary: "Latest non-fixture Airflow run failed"}
+      - alert: DataQualityGateFailed
+        expr: foody_pipeline_quality_gate_failed == 1
+        for: 2m
+        labels: {severity: critical, component: data_quality}
+        annotations: {summary: "Latest non-fixture quality gate failed"}
+      - alert: HighLLMLatency
+        expr: histogram_quantile(0.95, sum by (le) (rate(foody_model_gateway_latency_seconds_bucket[10m]))) > 90
+        for: 10m
+        labels: {severity: warning, component: llm}
+        annotations: {summary: "LLM gateway P95 latency exceeded 90 seconds"}
+      - alert: TextToSQLValidationFailureSpike
+        expr: sum(increase(text_to_sql_validation_failures_total[10m])) > 5
+        for: 2m
+        labels: {severity: warning, component: text_to_sql}
+        annotations: {summary: "Text-to-SQL validator rejected more than five attempts"}
+      - alert: TextToSQLExecutionFailureSpike
+        expr: sum(increase(text_to_sql_execution_failures_total[10m])) > 2
+        for: 2m
+        labels: {severity: critical, component: text_to_sql}
+        annotations: {summary: "Text-to-SQL execution failures exceeded two attempts"}
+      - alert: RAGInsufficientEvidenceSpike
+        expr: sum(increase(foody_rag_insufficient_evidence_total[10m])) > 5
+        for: 2m
+        labels: {severity: warning, component: rag}
+        annotations: {summary: "RAG insufficient-evidence responses increased"}
+      - alert: HighMemoryUsage
+        expr: foody_host_memory_usage_ratio > 0.92
+        for: 10m
+        labels: {severity: warning, component: infrastructure}
+        annotations: {summary: "Visible host memory use exceeded 92 percent"}

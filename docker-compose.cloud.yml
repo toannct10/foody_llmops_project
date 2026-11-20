@@ -1,0 +1,13 @@
+# Add only for an explicitly configured cloud RAW run.
+services:
+  airflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.airflow-cloud
+    image: foody-airflow-cloud:local
+    env_file:
+      - path: .env.cloud
+        required: false
+    volumes:
+      - ./outputs/dbt/target:/app/dbt/target
+      - ./logs/dbt:/app/dbt/logs

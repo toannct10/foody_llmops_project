@@ -1,0 +1,16 @@
+# Environment-only example profile. No account, password or key is stored here.
+# Dummy defaults permit offline `dbt parse`; live debug/run require real values.
+foody_cloud_analytics:
+  target: prod
+  outputs:
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'UNCONFIGURED') }}"
+      user: "{{ env_var('SNOWFLAKE_USER', 'UNCONFIGURED') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD', 'UNCONFIGURED') }}"
+      role: "{{ env_var('SNOWFLAKE_DBT_ROLE', 'FOODY_TRANSFORM_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'FOODY_WH') }}"
+      database: "{{ env_var('SNOWFLAKE_DATABASE', 'FOODY') }}"
+      schema: "{{ env_var('SNOWFLAKE_STAGING_SCHEMA', 'STAGING') }}"
+      threads: 2
+      client_session_keep_alive: false
